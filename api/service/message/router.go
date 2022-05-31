@@ -19,8 +19,6 @@ func InitializeMessageRouter(r *mux.Router) {
 
 //get all messages within a specified time frame
 func getAllMessages(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	timestr := r.URL.Query().Get("timestamp")
 	timestamp, err := strToUinxStamp(timestr)
 	messages := []Message{}
@@ -58,7 +56,6 @@ func strToUinxStamp(str string) (time.Time, error) {
 
 //create a new message
 func createNewMessage(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	var newMessage Message
 
 	err := json.NewDecoder(r.Body).Decode(&newMessage)

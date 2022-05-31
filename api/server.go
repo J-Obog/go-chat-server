@@ -24,6 +24,7 @@ type Server struct {
 func NewServer(host string, port uint16) *Server {
 	server := &Server{Host: host, Port: port}
 	router := mux.NewRouter()
+	router.Use(StandardHeadersMiddleware)
 
 	//initialize service routes
 	message.InitializeMessageRouter(router.PathPrefix("/messages").Subrouter())
