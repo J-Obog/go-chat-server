@@ -22,18 +22,14 @@ type Server struct {
 }
 
 func NewServer(host string, port uint16) *Server {
-	return &Server{
-		Host:    host,
-		Port:    port,
-		handler: initializedHandler(),
-	}
-}
-
-//adds service handlers to base routers and returns the newly intialized router
-func initializedHandler() *mux.Router {
+	server := &Server{Host: host, Port: port}
 	router := mux.NewRouter()
+
+	//initialize service routes
 	message.InitializeMessageRouter(router.PathPrefix("/messages").Subrouter())
-	return router
+
+	server.handler = router
+	return server
 }
 
 //run server
