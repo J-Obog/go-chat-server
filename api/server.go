@@ -17,14 +17,22 @@ type Server struct {
 	Host string
 
 	//port number
-	Port    uint16
+	Port uint16
+
+	//basic logging turned on when debug enabled
+	Debug bool
+
 	handler *mux.Router
 }
 
-func NewServer(host string, port uint16) *Server {
-	server := &Server{Host: host, Port: port}
+func NewServer(host string, port uint16, debug bool) *Server {
+	server := &Server{Host: host, Port: port, Debug: debug}
 	router := mux.NewRouter()
 	router.Use(StandardHeadersMiddleware)
+
+	if debug {
+		router.Use(LoggingMiddleware)
+	}
 
 	//initialize service routes
 	message.InitializeMessageRouter(router.PathPrefix("/messages").Subrouter())
@@ -36,7 +44,15 @@ func NewServer(host string, port uint16) *Server {
 //run server
 func (this *Server) Run() {
 	addr := fmt.Sprintf("%s:%d", this.Host, this.Port)
-	log.Println("Server listening at " + addr)
-	log.Fatal(http.ListenAndServe(addr, this.handler))
+	if this.Debug {
+		log.Println("Server listening at " + addr)
+	}
+
+	err := http.ListenAndServe(addr, this.handler)
+
+	if err != nil && this.Debug {
+		log.Fatal(err)
+	}
+
 	os.Exit(0)
 }
