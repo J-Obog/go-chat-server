@@ -19,13 +19,19 @@ func InitializeMessageRouter(r *mux.Router) {
 
 //get all messages within a specified time frame
 func getAllMessages(w http.ResponseWriter, r *http.Request) {
-	timestr := r.URL.Query().Get("timestamp")
-	timestamp, err := strToUinxStamp(timestr)
+	var timestamp time.Time
 	messages := []Message{}
+	timestr := r.URL.Query().Get("timestamp")
 
-	if err != nil {
-		w.WriteHeader(500)
-		return
+	//only set timestamp if 'timestamp' parameter is present in url
+	if timestr != "" {
+		stamp, err := strToUinxStamp(timestr)
+
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
+		timestamp = stamp
 	}
 
 	//only retrieve messages sent after timestamp
@@ -35,7 +41,7 @@ func getAllMessages(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = json.NewEncoder(w).Encode(messages)
+	err := json.NewEncoder(w).Encode(messages)
 
 	if err != nil {
 		w.WriteHeader(500)
