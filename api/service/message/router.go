@@ -6,11 +6,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func NewMessageRouter() *mux.Router {
-	router := mux.NewRouter()
-	router.HandleFunc("/message", getAllMessages).Methods("GET")
-	router.HandleFunc("/message", createNewMessage).Methods("POST")
-	return router
+func InitializeMessageRouter(r *mux.Router) {
+	r.HandleFunc("/message", getAllMessages).Methods("GET")
+	r.HandleFunc("/message", createNewMessage).Methods("POST")
 }
 
 //get all messages within a specified time frame

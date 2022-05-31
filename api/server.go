@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/J-Obog/go-chat-server/api/service/message"
 	"github.com/gorilla/mux"
 )
 
@@ -31,6 +32,7 @@ func NewServer(host string, port uint16) *Server {
 //adds service handlers to base routers and returns the newly intialized router
 func initializedHandler() *mux.Router {
 	router := mux.NewRouter()
+	message.InitializeMessageRouter(router.PathPrefix("/messages").Subrouter())
 	return router
 }
 
