@@ -30,6 +30,7 @@ func getAllMessages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//only retrieve messages sent after timestamp
 	for _, message := range messageStore {
 		if message.SentAt.After(timestamp) {
 			messages = append(messages, message)
