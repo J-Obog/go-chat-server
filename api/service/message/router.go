@@ -28,7 +28,7 @@ func getAllMessages(w http.ResponseWriter, r *http.Request) {
 		stamp, err := strToUinxStamp(timestr)
 
 		if err != nil {
-			w.WriteHeader(500)
+			makeRequestError("Error parsing timestamp", 400, w)
 			return
 		}
 		timestamp = stamp
@@ -44,7 +44,7 @@ func getAllMessages(w http.ResponseWriter, r *http.Request) {
 	err := json.NewEncoder(w).Encode(messages)
 
 	if err != nil {
-		w.WriteHeader(500)
+		makeRequestError("Internal server error", 500, w)
 		return
 	}
 }
@@ -67,11 +67,22 @@ func createNewMessage(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&newMessage)
 
 	if err != nil {
-		w.WriteHeader(500)
+		makeRequestError("Internal server error", 500, w)
 		return
 	}
 
 	newMessage.ID = ksuid.New()
 	newMessage.SentAt = time.Now()
 	messageStore = append(messageStore, newMessage)
+	w.Write([]byte("Message successfully stored"))
+}
+
+//writing error message from request
+func makeRequestError(errMsg string, code int, w http.ResponseWriter) {
+	w.WriteHeader(code)
+
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": errMsg,
+		"status":  strconv.Itoa(code),
+	})
 }
