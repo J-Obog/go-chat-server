@@ -3,6 +3,7 @@ package message
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -19,14 +20,39 @@ func InitializeMessageRouter(r *mux.Router) {
 //get all messages within a specified time frame
 func getAllMessages(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	messages := messageStore
 
-	err := json.NewEncoder(w).Encode(messages)
+	timestr := r.URL.Query().Get("timestamp")
+	timestamp, err := strToUinxStamp(timestr)
+	messages := []Message{}
 
 	if err != nil {
 		w.WriteHeader(500)
 		return
 	}
+
+	for _, message := range messageStore {
+		if message.SentAt.After(timestamp) {
+			messages = append(messages, message)
+		}
+	}
+
+	err = json.NewEncoder(w).Encode(messages)
+
+	if err != nil {
+		w.WriteHeader(500)
+		return
+	}
+}
+
+//convert a string to a unix timestamp
+func strToUinxStamp(str string) (time.Time, error) {
+	num, err := strconv.ParseInt(str, 10, 64)
+
+	if err != nil {
+		return time.Unix(0, 0), err
+	}
+
+	return time.Unix(num, 0), nil
 }
 
 //create a new message
