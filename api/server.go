@@ -35,6 +35,7 @@ func NewServer(host string, port uint16) *Server {
 //run server
 func (this *Server) Run() {
 	addr := fmt.Sprintf("%s:%d", this.Host, this.Port)
+	log.Println("Server listening at " + addr)
 	log.Fatal(http.ListenAndServe(addr, this.handler))
 	os.Exit(0)
 }
