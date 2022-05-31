@@ -18,11 +18,20 @@ func InitializeMessageRouter(r *mux.Router) {
 
 //get all messages within a specified time frame
 func getAllMessages(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	messages := messageStore
 
+	err := json.NewEncoder(w).Encode(messages)
+
+	if err != nil {
+		w.WriteHeader(500)
+		return
+	}
 }
 
 //create a new message
 func createNewMessage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	var newMessage Message
 
 	err := json.NewDecoder(r.Body).Decode(&newMessage)
